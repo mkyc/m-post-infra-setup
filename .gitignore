@@ -2,3 +2,4 @@
 /resources/artifacts/
 /resources/env/
 /resources/inventory/
+/resources/.ansible/
