@@ -32,3 +32,7 @@
   when: >
     stt.stat.exists is defined and stt.stat.exists and
     stt.stat.islnk is defined and stt.stat.islnk
+- name: set fact about volume
+  set_fact:
+    cacheable: true
+    luns: "{{ luns | default({}) | combine( { vol.lun : { stt.stat.lnk_source + '1' : vol.mountpoint } } ) }}"
