@@ -1,6 +1,6 @@
 package main
 
-import "github.com/mkyc/m-post-infra-setup/cmd"
+import "github.com/mkyc/m-host-init/cmd"
 
 func main() {
 	cmd.Execute()

@@ -1,7 +1,7 @@
 ROOT_DIR := $(patsubst %/,%,$(dir $(abspath $(firstword $(MAKEFILE_LIST)))))
 
 VERSION ?= dev
-IMAGE_REPOSITORY := epiphanyplatform/pis
+IMAGE_REPOSITORY := epiphanyplatform/hi
 
 IMAGE_NAME := $(IMAGE_REPOSITORY):$(VERSION)
 

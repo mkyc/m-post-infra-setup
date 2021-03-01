@@ -1,4 +1,4 @@
-module github.com/mkyc/m-post-infra-setup
+module github.com/mkyc/m-host-init
 
 go 1.15
 
