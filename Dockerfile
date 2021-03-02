@@ -27,10 +27,8 @@ ENTRYPOINT ["/workdir/entrypoint"]
 COPY resources/project /resources/project
 COPY --from=builder /entrypoint /workdir
 
-ARG ARG_HOST_UID=1000
-ARG ARG_HOST_GID=1000
-RUN chown -R $ARG_HOST_UID:$ARG_HOST_GID \
-    /workdir \
-    /resources
-
-USER $ARG_HOST_UID:$ARG_HOST_GID
+#ARG ARG_HOST_UID=1000
+#ARG ARG_HOST_GID=1000
+#RUN chown -R $ARG_HOST_UID:$ARG_HOST_GID /workdir /resources ~/.ansible/
+#
+#USER $ARG_HOST_UID:$ARG_HOST_GID

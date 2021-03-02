@@ -15,6 +15,10 @@ const (
 	moduleShortName = "hi"
 	configFileName  = "hi-config.json"
 	stateFileName   = "state.json"
+	inventoryDir    = "inventory"
+	inventoryFile   = "hosts.json"
+	envDir          = "env"
+	sshKeyFile      = "ssh_key"
 
 	defaultSharedDirectory    = "/shared"
 	defaultResourcesDirectory = "/resources"
@@ -70,6 +74,9 @@ func init() {
 	cobra.OnInitialize(initConfig)
 
 	rootCmd.PersistentFlags().BoolVarP(&enableDebug, "debug", "d", false, "print debug information")
+
+	rootCmd.PersistentFlags().String("shared", defaultSharedDirectory, "shared directory location")
+	rootCmd.PersistentFlags().String("resources", defaultResourcesDirectory, "resources directory location")
 }
 
 // initConfig reads in config file and ENV variables if set.

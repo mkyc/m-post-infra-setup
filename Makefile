@@ -23,11 +23,13 @@ build: guard-IMAGE_NAME
 	cp -R ../../epiphany-platform/e-structures/ ./tmp
 	docker build \
 		--build-arg ARG_M_VERSION=$(VERSION) \
-		--build-arg ARG_HOST_UID=$(HOST_UID) \
-		--build-arg ARG_HOST_GID=$(HOST_GID) \
 		-t $(IMAGE_NAME) \
 		.
 	rm -rf ./tmp
+
+#		--build-arg ARG_HOST_UID=$(HOST_UID) \
+#		--build-arg ARG_HOST_GID=$(HOST_GID) \
+
 
 print-%:
 	@echo "$($*)"

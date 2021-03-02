@@ -1,8 +1,12 @@
 package cmd
 
 import (
+	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"os"
+	"path/filepath"
+	"strconv"
 
 	hi "github.com/epiphany-platform/e-structures/hi/v0"
 	st "github.com/epiphany-platform/e-structures/state/v0"
@@ -95,4 +99,90 @@ func backupFile(path string) error {
 		}
 		return nil
 	}
+}
+
+func checkAndLoad(stateFilePath string, configFilePath string) (*hi.Config, *st.State, error) {
+	logger.Debug().Msgf("checkAndLoad(%s, %s)", stateFilePath, configFilePath)
+	if _, err := os.Stat(stateFilePath); os.IsNotExist(err) {
+		return nil, nil, errors.New("state file does not exist, please run init first")
+	}
+	if _, err := os.Stat(configFilePath); os.IsNotExist(err) {
+		return nil, nil, errors.New("config file does not exist, please run init first")
+	}
+
+	state, err := loadState(stateFilePath)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	config, err := loadConfig(configFilePath)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return config, state, nil
+}
+
+func templateInventory(config *hi.Config) error {
+	logger.Debug().Msg("templateInventory")
+	inventoryFilePath := filepath.Join(ResourcesDirectory, inventoryDir, inventoryFile)
+	err := ensureDirectory(filepath.Join(ResourcesDirectory, inventoryDir))
+	if err != nil {
+		return err
+	}
+
+	groups := make(map[string]interface{})
+	for _, vmg := range config.Params.VmGroups {
+		hosts := make(map[string]interface{})
+		vars := make(map[string]interface{})
+		for _, vm := range vmg.Hosts {
+			hosts[*vm.Name] = map[string]string{"ansible_host": *vm.Ip}
+		}
+		vars["ansible_user"] = *vmg.AdminUser
+		mountPoints := make([]map[string]string, 0, 0)
+		for _, mp := range vmg.MountPoints {
+			mountPoints = append(mountPoints, map[string]string{
+				"lun":        strconv.Itoa(*mp.Lun),
+				"mountpoint": *mp.Path,
+			})
+		}
+		vars["mountpoints"] = mountPoints
+		groups[*vmg.Name] = map[string]interface{}{"hosts": hosts, "vars": vars}
+	}
+
+	data := map[string]interface{}{
+		"all": map[string]interface{}{
+			"children": groups,
+		},
+	}
+
+	bytes, err := json.Marshal(&data)
+	if err != nil {
+		return err
+	}
+	logger.Info().Msg(string(bytes))
+	err = ioutil.WriteFile(inventoryFilePath, bytes, 0644)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func prepareSshKey(config *hi.Config) error {
+	logger.Debug().Msg("prepareSshKey")
+	sshKeyFilePath := filepath.Join(ResourcesDirectory, envDir, sshKeyFile)
+	err := ensureDirectory(filepath.Join(ResourcesDirectory, envDir))
+	if err != nil {
+		return err
+	}
+	input, err := ioutil.ReadFile(*config.Params.RsaPrivateKeyPath)
+	if err != nil {
+		return err
+	}
+	err = ioutil.WriteFile(sshKeyFilePath, input, 0600)
+	if err != nil {
+		return err
+	}
+	logger.Debug().Msgf("file %s copied to %s", *config.Params.RsaPrivateKeyPath, sshKeyFilePath)
+	return nil
 }

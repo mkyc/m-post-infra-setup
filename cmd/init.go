@@ -56,6 +56,7 @@ to quickly create a Cobra application.`,
 		if err != nil {
 			logger.Fatal().Err(err).Msg("loadState failed")
 		}
+		// TODO probably get it out from here due to https://github.com/epiphany-platform/e-structures/issues/10
 		if state.Hi == nil {
 			state.Hi = &st.HiState{}
 		}
@@ -80,54 +81,52 @@ to quickly create a Cobra application.`,
 			logger.Fatal().Err(err).Msg("backupFile failed")
 		}
 
-		config.GetParams().RsaPublicKeyPath = to.StrPtr(filepath.Join(SharedDirectory, fmt.Sprintf("%s.pub", vmsRsaPath)))
+		config.GetParams().RsaPrivateKeyPath = to.StrPtr(filepath.Join(SharedDirectory, vmsRsaPath))
 
 		if !omitState {
 			if state.GetAzBIState().Status == st.Applied {
-				if state.GetAzBIState().GetConfig().GetParams().GetRsaPublicKeyV() != "" {
-					config.GetParams().RsaPublicKeyPath = to.StrPtr(state.GetAzBIState().GetConfig().GetParams().GetRsaPublicKeyV())
-					fmt.Println("Found and used 'vms_rsa' parameter in existing AzBI configuration.")
-				}
-			}
 
-			hiVmGroups := make([]hi.VmGroup, 0, 0)
-			for _, vmg := range state.GetAzBIState().GetOutput().GetVmGroups() {
-				hiVmGroup := hi.VmGroup{
-					Name:        vmg.Name,
-					Hosts:       []hi.Host{},
-					MountPoints: []hi.MountPoint{},
-				}
-				for _, outputDataDisk := range vmg.GetFirstVm().DataDisks {
-					mountPoint := hi.MountPoint{
-						Lun:  outputDataDisk.Lun,
-						Path: to.StrPtr(fmt.Sprintf("/data/lun%d", *outputDataDisk.Lun)),
+				hiVmGroups := make([]hi.VmGroup, 0, 0)
+				for _, vmg := range state.GetAzBIState().GetOutput().GetVmGroups() {
+					hiVmGroup := hi.VmGroup{
+						Name:        vmg.Name,
+						AdminUser:   to.StrPtr("operations"), //TODO extract it from AzBI config when https://github.com/epiphany-platform/m-azure-basic-infrastructure/issues/76 is done
+						Hosts:       []hi.Host{},
+						MountPoints: []hi.MountPoint{},
 					}
-					hiVmGroup.MountPoints = append(hiVmGroup.MountPoints, mountPoint)
-				}
-
-				for _, vm := range vmg.GetVms() {
-					if useHostsPublicIPs {
-						host := hi.Host{
-							Name: vm.Name,
-							Ip:   vm.PublicIp,
+					for _, outputDataDisk := range vmg.GetFirstVm().DataDisks {
+						mountPoint := hi.MountPoint{
+							Lun:  outputDataDisk.Lun,
+							Path: to.StrPtr(fmt.Sprintf("/data/lun%d", *outputDataDisk.Lun)),
 						}
-						hiVmGroup.Hosts = append(hiVmGroup.Hosts, host)
-					} else {
-						if vm.PrivateIps != nil && len(vm.PrivateIps) > 0 {
+						hiVmGroup.MountPoints = append(hiVmGroup.MountPoints, mountPoint)
+					}
+
+					for _, vm := range vmg.GetVms() {
+						if useHostsPublicIPs {
 							host := hi.Host{
 								Name: vm.Name,
-								Ip:   to.StrPtr(vm.PrivateIps[0]),
+								Ip:   vm.PublicIp,
 							}
 							hiVmGroup.Hosts = append(hiVmGroup.Hosts, host)
 						} else {
-							logger.Warn().Msgf("host %s doesn't have private IPs", *vm.Name)
+							if vm.PrivateIps != nil && len(vm.PrivateIps) > 0 {
+								host := hi.Host{
+									Name: vm.Name,
+									Ip:   to.StrPtr(vm.PrivateIps[0]),
+								}
+								hiVmGroup.Hosts = append(hiVmGroup.Hosts, host)
+							} else {
+								logger.Warn().Msgf("host %s doesn't have private IPs", *vm.Name)
+							}
 						}
 					}
-				}
 
-				hiVmGroups = append(hiVmGroups, hiVmGroup)
+					hiVmGroups = append(hiVmGroups, hiVmGroup)
+				}
+				config.GetParams().VmGroups = hiVmGroups
+
 			}
-			config.GetParams().VmGroups = hiVmGroups
 		}
 
 		state.Hi.Status = st.Initialized
