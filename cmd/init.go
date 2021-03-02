@@ -17,7 +17,8 @@ import (
 var (
 	omitState bool
 
-	vmsRsaPath string
+	vmsRsaPath        string
+	useHostsPublicIPs bool
 )
 
 // initCmd represents the init command
@@ -93,6 +94,7 @@ to quickly create a Cobra application.`,
 			for _, vmg := range state.GetAzBIState().GetOutput().GetVmGroups() {
 				hiVmGroup := hi.VmGroup{
 					Name:        vmg.Name,
+					Hosts:       []hi.Host{},
 					MountPoints: []hi.MountPoint{},
 				}
 				for _, outputDataDisk := range vmg.GetFirstVm().DataDisks {
@@ -102,6 +104,27 @@ to quickly create a Cobra application.`,
 					}
 					hiVmGroup.MountPoints = append(hiVmGroup.MountPoints, mountPoint)
 				}
+
+				for _, vm := range vmg.GetVms() {
+					if useHostsPublicIPs {
+						host := hi.Host{
+							Name: vm.Name,
+							Ip:   vm.PublicIp,
+						}
+						hiVmGroup.Hosts = append(hiVmGroup.Hosts, host)
+					} else {
+						if vm.PrivateIps != nil && len(vm.PrivateIps) > 0 {
+							host := hi.Host{
+								Name: vm.Name,
+								Ip:   to.StrPtr(vm.PrivateIps[0]),
+							}
+							hiVmGroup.Hosts = append(hiVmGroup.Hosts, host)
+						} else {
+							logger.Warn().Msgf("host %s doesn't have private IPs", *vm.Name)
+						}
+					}
+				}
+
 				hiVmGroups = append(hiVmGroups, hiVmGroup)
 			}
 			config.GetParams().VmGroups = hiVmGroups
@@ -134,6 +157,6 @@ func init() {
 	rootCmd.AddCommand(initCmd)
 
 	initCmd.Flags().BoolVarP(&omitState, "omit_state", "o", false, "omit state values during initialization")
-
+	initCmd.Flags().BoolVarP(&useHostsPublicIPs, "use_public_ip", "p", false, "use public IP to access hosts")
 	initCmd.Flags().String("vms_rsa", "vms_rsa", "name of rsa keypair to be provided to machines")
 }
