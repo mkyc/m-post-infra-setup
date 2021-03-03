@@ -186,3 +186,19 @@ func prepareSshKey(config *hi.Config) error {
 	logger.Debug().Msgf("file %s copied to %s", *config.Params.RsaPrivateKeyPath, sshKeyFilePath)
 	return nil
 }
+
+func setCheckAndDiff() error {
+	logger.Debug().Msg("setCheckAndDiff")
+	cmdlineFilePath := filepath.Join(ResourcesDirectory, envDir, cmdlineFile)
+	err := ensureDirectory(filepath.Join(ResourcesDirectory, envDir))
+	if err != nil {
+		return err
+	}
+	content := []byte("--check --diff")
+	err = ioutil.WriteFile(cmdlineFilePath, content, 0644)
+	if err != nil {
+		return err
+	}
+	logger.Debug().Msgf("file %s created with content: [%s]", cmdlineFilePath, string(content))
+	return nil
+}

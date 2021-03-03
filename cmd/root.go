@@ -19,13 +19,15 @@ const (
 	inventoryFile   = "hosts.json"
 	envDir          = "env"
 	sshKeyFile      = "ssh_key"
+	cmdlineFile     = "cmdline"
 
 	defaultSharedDirectory    = "/shared"
 	defaultResourcesDirectory = "/resources"
 )
 
 var (
-	enableDebug bool
+	enableDebug       bool
+	ansibleDebugLevel int
 
 	Version string
 
@@ -55,6 +57,14 @@ to quickly create a Cobra application.`,
 
 		SharedDirectory = viper.GetString("shared")
 		ResourcesDirectory = viper.GetString("resources")
+
+		logger.Trace().Msgf("original ansibleDebugLevel: %d", ansibleDebugLevel)
+		if ansibleDebugLevel > 6 {
+			ansibleDebugLevel = 6
+		}
+		if ansibleDebugLevel < 0 {
+			ansibleDebugLevel = 0
+		}
 	},
 	Version: Version,
 }
@@ -77,6 +87,7 @@ func init() {
 
 	rootCmd.PersistentFlags().String("shared", defaultSharedDirectory, "shared directory location")
 	rootCmd.PersistentFlags().String("resources", defaultResourcesDirectory, "resources directory location")
+	rootCmd.PersistentFlags().IntVarP(&ansibleDebugLevel, "ansible_debug_level", "a", 0, "set ansible debug level 0-6")
 }
 
 // initConfig reads in config file and ENV variables if set.
