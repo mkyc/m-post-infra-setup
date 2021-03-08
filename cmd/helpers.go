@@ -3,11 +3,12 @@ package cmd
 import (
 	"encoding/json"
 	"errors"
-	"github.com/epiphany-platform/e-structures/utils/load"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strconv"
+
+	"github.com/epiphany-platform/e-structures/utils/load"
 
 	hi "github.com/epiphany-platform/e-structures/hi/v0"
 	st "github.com/epiphany-platform/e-structures/state/v0"

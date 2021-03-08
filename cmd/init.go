@@ -3,13 +3,13 @@ package cmd
 import (
 	"errors"
 	"fmt"
-	"github.com/epiphany-platform/e-structures/utils/load"
-	"github.com/epiphany-platform/e-structures/utils/save"
 	"path/filepath"
 	"reflect"
 
 	hi "github.com/epiphany-platform/e-structures/hi/v0"
 	st "github.com/epiphany-platform/e-structures/state/v0"
+	"github.com/epiphany-platform/e-structures/utils/load"
+	"github.com/epiphany-platform/e-structures/utils/save"
 	"github.com/epiphany-platform/e-structures/utils/to"
 	"github.com/spf13/viper"
 
@@ -64,8 +64,10 @@ to quickly create a Cobra application.`,
 			logger.Fatal().Err(err).Msg("loadConfig failed")
 		}
 
-		if !reflect.DeepEqual(state.Hi, &st.HiState{}) && state.Hi.Status != st.Initialized && state.Hi.Status != st.Destroyed {
-			logger.Fatal().Err(errors.New(string("unexpected state: " + state.Hi.Status))).Msg("incorrect state")
+		if state.GetHiState() != nil {
+			if !reflect.DeepEqual(state.GetHiState(), &st.HiState{}) && state.GetHiState().Status != st.Initialized && state.GetHiState().Status != st.Destroyed {
+				logger.Fatal().Err(errors.New(string("unexpected state: " + state.GetHiState().Status))).Msg("incorrect state")
+			}
 		}
 
 		logger.Debug().Msg("backup state file")
