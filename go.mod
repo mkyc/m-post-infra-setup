@@ -9,7 +9,7 @@ require (
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/magiconair/properties v1.8.4 // indirect
 	github.com/mitchellh/mapstructure v1.4.1 // indirect
-	github.com/mkyc/go-ansible-runner v0.0.3
+	github.com/mkyc/go-ansible-runner v0.0.4
 	github.com/pelletier/go-toml v1.8.1 // indirect
 	github.com/rs/zerolog v1.20.0
 	github.com/spf13/afero v1.5.1 // indirect

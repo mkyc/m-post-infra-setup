@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"encoding/json"
 	"time"
 
 	gar "github.com/mkyc/go-ansible-runner"
@@ -44,7 +45,8 @@ func ansiblePlan() (string, error) {
 		LogsLevel:        makeAnsibleLogLevel(ansibleDebugLevel),
 		Logger:           ZeroLogger{},
 	}
-	return gar.Run(options)
+	_, err = gar.Run(options)
+	return checkPlayResults(options, err)
 }
 
 func ansibleRun() (string, error) {
@@ -56,5 +58,26 @@ func ansibleRun() (string, error) {
 		LogsLevel:        makeAnsibleLogLevel(ansibleDebugLevel),
 		Logger:           ZeroLogger{},
 	}
-	return gar.Run(options)
+	_, err := gar.Run(options)
+	return checkPlayResults(options, err)
+}
+
+func checkPlayResults(options gar.Options, err error) (string, error) {
+
+	output, err2 := gar.GetOutput(options)
+	if err2 != nil {
+		return string(output), err2
+	}
+	rc, status, _ := gar.GetStatus(options)
+	logger.Info().Msgf("RC: %d, Status: %s", rc, status)
+
+	pr, _ := gar.GetPlayRecap(options)
+	prBytes, _ := json.Marshal(pr)
+	logger.Debug().Msgf("PlayRecap: %s", string(prBytes))
+
+	tc := gar.Count(*pr)
+	logger.Info().Msgf("Changed: %d, Failures: %d, Ignored: %d, Ok: %d, Processed: %d, Rescued: %d, Skipped: %d.",
+		tc.Changed, tc.Failures, tc.Ignored, tc.Ok, tc.Processed, tc.Rescued, tc.Skipped)
+
+	return string(output), err
 }
