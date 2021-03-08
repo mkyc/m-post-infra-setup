@@ -3,6 +3,8 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"github.com/epiphany-platform/e-structures/utils/load"
+	"github.com/epiphany-platform/e-structures/utils/save"
 	"path/filepath"
 	"reflect"
 
@@ -52,7 +54,7 @@ to quickly create a Cobra application.`,
 			logger.Fatal().Err(err).Msg("ensureDirectory failed")
 		}
 		logger.Debug().Msg("load state file")
-		state, err := loadState(stateFilePath)
+		state, err := load.State(stateFilePath)
 		if err != nil {
 			logger.Fatal().Err(err).Msg("loadState failed")
 		}
@@ -61,7 +63,7 @@ to quickly create a Cobra application.`,
 			state.Hi = &st.HiState{}
 		}
 		logger.Debug().Msg("load config file")
-		config, err := loadConfig(configFilePath)
+		config, err := load.HiConfig(configFilePath)
 		if err != nil {
 			logger.Fatal().Err(err).Msg("loadConfig failed")
 		}
@@ -133,12 +135,12 @@ to quickly create a Cobra application.`,
 		state.Hi.Config = config
 
 		logger.Debug().Msg("save config")
-		err = saveConfig(configFilePath, config)
+		err = save.HiConfig(configFilePath, config)
 		if err != nil {
 			logger.Fatal().Err(err).Msg("saveConfig failed")
 		}
 		logger.Debug().Msg("save state")
-		err = saveState(stateFilePath, state)
+		err = save.State(stateFilePath, state)
 		if err != nil {
 			logger.Fatal().Err(err).Msg("saveState failed")
 		}

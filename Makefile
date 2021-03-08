@@ -20,7 +20,7 @@ all: build
 build: guard-IMAGE_NAME
 	rm -rf ./tmp
 	mkdir -p ./tmp
-	cp -R ../../epiphany-platform/e-structures/ ./tmp
+	cp -R ../../epiphany-platform/e-structures/ ./tmp/e-structures
 	docker build \
 		--build-arg ARG_M_VERSION=$(VERSION) \
 		-t $(IMAGE_NAME) \
