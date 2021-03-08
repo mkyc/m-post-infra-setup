@@ -58,10 +58,6 @@ to quickly create a Cobra application.`,
 		if err != nil {
 			logger.Fatal().Err(err).Msg("loadState failed")
 		}
-		// TODO probably get it out from here due to https://github.com/epiphany-platform/e-structures/issues/10
-		if state.Hi == nil {
-			state.Hi = &st.HiState{}
-		}
 		logger.Debug().Msg("load config file")
 		config, err := load.HiConfig(configFilePath)
 		if err != nil {
@@ -131,6 +127,9 @@ to quickly create a Cobra application.`,
 			}
 		}
 
+		if state.Hi == nil {
+			state.Hi = &st.HiState{}
+		}
 		state.Hi.Status = st.Initialized
 		state.Hi.Config = config
 
