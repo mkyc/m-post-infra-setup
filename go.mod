@@ -2,8 +2,6 @@ module github.com/mkyc/m-host-init
 
 go 1.15
 
-replace github.com/epiphany-platform/e-structures => ../../epiphany-platform/e-structures
-
 require (
 	github.com/epiphany-platform/e-structures v0.0.7
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
