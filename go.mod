@@ -1,4 +1,4 @@
-module github.com/mkyc/m-host-init
+module github.com/epiphany-platform/m-host-init
 
 go 1.15
 

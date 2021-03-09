@@ -1,6 +1,6 @@
 # golang builder
 FROM golang:1.15.2 as builder
-ARG ARG_GO_MODULE_NAME="github.com/mkyc/m-host-init"
+ARG ARG_GO_MODULE_NAME="github.com/epiphany-platform/m-host-init"
 ENV GO_MODULE_NAME=$ARG_GO_MODULE_NAME
 ARG ARG_M_VERSION="dev"
 ENV M_VERSION=$ARG_M_VERSION
