@@ -9,13 +9,13 @@ import (
 // applyCmd represents the run command
 var applyCmd = &cobra.Command{
 	Use:   "apply",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Short: "applies planned changes to machines",
+	Long: `Applies planned changes to machines. 
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+Using provided configuration file this command applies expected ansible logic. This command performs following steps: 
+ - validates presence of config and module state files
+ - performs 'ansible run' operation
+ - updates module state file with applied config.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		logger.Debug().Msg("run called")
 		configFilePath := filepath.Join(SharedDirectory, moduleShortName, configFileName)
