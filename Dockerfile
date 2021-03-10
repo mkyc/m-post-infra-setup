@@ -1,15 +1,18 @@
 # golang builder
 FROM golang:1.15.2 as builder
-ARG ARG_GO_MODULE_NAME="github.com/epiphany-platform/m-host-init"
-ENV GO_MODULE_NAME=$ARG_GO_MODULE_NAME
-ARG ARG_M_VERSION="dev"
-ENV M_VERSION=$ARG_M_VERSION
-RUN mkdir -p $GOPATH/src/$GO_MODULE_NAME
-COPY . $GOPATH/src/$GO_MODULE_NAME
-WORKDIR $GOPATH/src/$GO_MODULE_NAME
-RUN go get -v
-RUN go get github.com/ahmetb/govvv
-RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w $(govvv -flags -pkg $GO_MODULE_NAME/cmd -version $M_VERSION)" -x -o /entrypoint $GO_MODULE_NAME
+
+ARG ARG_GO_MODULE_NAME
+ENV ARG_GO_MODULE_NAME=${ARG_GO_MODULE_NAME:-github.com/epiphany-platform/m-host-init}
+ARG ARG_M_VERSION
+ENV ARG_M_VERSION=${ARG_M_VERSION:-dev}
+
+RUN mkdir -p $GOPATH/src/$ARG_GO_MODULE_NAME
+COPY . $GOPATH/src/$ARG_GO_MODULE_NAME
+WORKDIR $GOPATH/src/$ARG_GO_MODULE_NAME
+
+RUN go get -v &&\
+  go get github.com/ahmetb/govvv &&\
+  CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w $(govvv -flags -pkg $ARG_GO_MODULE_NAME/cmd -version $ARG_M_VERSION)" -x -o /entrypoint $ARG_GO_MODULE_NAME
 
 # main
 FROM quay.io/ansible/ansible-runner:stable-2.10-devel
