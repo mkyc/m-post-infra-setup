@@ -26,6 +26,7 @@ ENTRYPOINT ["/workdir/entrypoint"]
 COPY resources/project /resources/project
 COPY --from=builder /entrypoint /workdir
 
+# TODO change source image to be able to change user (additional context: https://github.com/ansible/ansible-runner/issues/611)
 #ARG ARG_HOST_UID=1000
 #ARG ARG_HOST_GID=1000
 #RUN chown -R $ARG_HOST_UID:$ARG_HOST_GID /workdir /resources ~/.ansible/

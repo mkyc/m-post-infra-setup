@@ -23,13 +23,9 @@ build: guard-IMAGE_NAME
 		-t $(IMAGE_NAME) \
 		.
 
+# TODO change source image to be able to change user (additional context: https://github.com/ansible/ansible-runner/issues/611)
 #		--build-arg ARG_HOST_UID=$(HOST_UID) \
 #		--build-arg ARG_HOST_GID=$(HOST_GID) \
-
-
-print-%:
-	@echo "$($*)"
-	
 
 guard-%:
 	@ if [ "${${*}}" = "" ]; then \
