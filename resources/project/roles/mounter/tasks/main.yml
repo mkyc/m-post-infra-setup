@@ -8,30 +8,27 @@
         device: "{{ stt.stat.lnk_source }}"
         state: info
       register: di
-      become: true
     - block:
         - community.general.parted:
             device: "{{ stt.stat.lnk_source }}"
             number: 1
             state: present
-          become: true
         - community.general.filesystem:
             dev: "{{ stt.stat.lnk_source }}1"
             fstype: ext4
-          become: true
         - ansible.posix.mount:
             fstype: ext4
             opts: noatime
             src: "{{ stt.stat.lnk_source }}1"
             path: "{{ vol.mountpoint }}"
             state: mounted
-          become: true
       when: >
         di.partitions is defined and
         di.partitions | length == 0
   when: >
     stt.stat.exists is defined and stt.stat.exists and
     stt.stat.islnk is defined and stt.stat.islnk
+  become: true
 - name: set fact about volume
   set_fact:
     cacheable: true
