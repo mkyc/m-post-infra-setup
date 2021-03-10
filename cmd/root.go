@@ -80,7 +80,9 @@ func init() {
 	rootCmd.PersistentFlags().BoolVarP(&enableDebug, "debug", "d", false, "print debug information")
 
 	rootCmd.PersistentFlags().String("shared", defaultSharedDirectory, "shared directory location")
+	_ = rootCmd.MarkPersistentFlagDirname("shared")
 	rootCmd.PersistentFlags().String("resources", defaultResourcesDirectory, "resources directory location")
+	_ = rootCmd.MarkPersistentFlagDirname("resources")
 	rootCmd.PersistentFlags().IntVarP(&ansibleDebugLevel, "ansible_debug_level", "a", 0, "set ansible debug level 0-6")
 }
 
