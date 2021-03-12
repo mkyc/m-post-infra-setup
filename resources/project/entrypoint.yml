@@ -4,6 +4,6 @@
     - name: Run "mounter" role
       include_role:
         name: mounter
-      with_items: "{{ mountpoints }}"
+      loop: "{{ mountpoints }}"
       loop_control:
         loop_var: vol
