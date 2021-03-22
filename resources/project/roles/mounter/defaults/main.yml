@@ -1,5 +1,5 @@
 ---
 # defaults file for mounter
-vol:
+mount:
   lun: "10"
   mountpoint: "/data/test1"

@@ -1,31 +1,31 @@
 ---
-- name: check lun
+- name: Check LUN
   ansible.builtin.stat:
-    path: "/dev/disk/azure/scsi1/lun{{ vol.lun }}"
-  register: stt
+    path: "/dev/disk/azure/scsi1/lun{{ mount.lun }}"
+  register: stat_lun
 
 - block:
     - name: get device info
       community.general.parted:
-        device: "{{ stt.stat.lnk_source }}"
+        device: "{{ stat_lun.stat.lnk_source }}"
         state: info
       register: di
 
     - block:
         - community.general.parted:
-            device: "{{ stt.stat.lnk_source }}"
+            device: "{{ stat_lun.stat.lnk_source }}"
             number: 1
             state: present
 
         - community.general.filesystem:
-            dev: "{{ stt.stat.lnk_source }}1"
+            dev: "{{ stat_lun.stat.lnk_source }}1"
             fstype: ext4
 
         - ansible.posix.mount:
             fstype: ext4
             opts: noatime
-            src: "{{ stt.stat.lnk_source }}1"
-            path: "{{ vol.mountpoint }}"
+            src: "{{ stat_lun.stat.lnk_source }}1"
+            path: "{{ mount.mountpoint }}"
             state: mounted
       when: >
         di.partitions is defined and
@@ -33,10 +33,10 @@
 
   become: true
   when: >
-    stt.stat.exists is defined and stt.stat.exists and
-    stt.stat.islnk is defined and stt.stat.islnk
+    stat_lun.stat.exists is defined and stat_lun.stat.exists and
+    stat_lun.stat.islnk is defined and stat_lun.stat.islnk
 
 - name: set fact about volume
   set_fact:
     cacheable: true
-    luns: "{{ luns | default({}) | combine( { vol.lun : { stt.stat.lnk_source + '1' : vol.mountpoint } } ) }}"
+    luns: "{{ luns | default({}) | combine( { mount.lun : { stat_lun.stat.lnk_source + '1' : mount.mountpoint } } ) }}"

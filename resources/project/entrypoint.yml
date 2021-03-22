@@ -6,4 +6,4 @@
         name: mounter
       loop: "{{ mountpoints }}"
       loop_control:
-        loop_var: vol
+        loop_var: mount
