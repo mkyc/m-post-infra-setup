@@ -5,7 +5,7 @@
   register: stat_lun
 
 - block:
-    - name: get device info
+    - name: Get device info
       community.general.parted:
         device: "{{ stat_lun.stat.lnk_source }}"
         state: info
@@ -36,7 +36,7 @@
     stat_lun.stat.exists is defined and stat_lun.stat.exists and
     stat_lun.stat.islnk is defined and stat_lun.stat.islnk
 
-- name: set fact about volume
+- name: Set mountpoints pafct
   set_fact:
     cacheable: true
     luns: "{{ luns | default({}) | combine( { mount.lun : { stat_lun.stat.lnk_source + '1' : mount.mountpoint } } ) }}"
