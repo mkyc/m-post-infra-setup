@@ -18,8 +18,8 @@ Using provided configuration file this command applies expected ansible logic. T
  - updates module state file with applied config.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		logger.Debug().Msg("run called")
-		configFilePath := filepath.Join(SharedDirectory, moduleShortName, configFileName)
-		stateFilePath := filepath.Join(SharedDirectory, stateFileName)
+		configFilePath := filepath.Join(SharedDirectoryPath, moduleShortName, configFileName)
+		stateFilePath := filepath.Join(SharedDirectoryPath, stateFileName)
 		config, _, err := checkAndLoad(stateFilePath, configFilePath)
 		if err != nil {
 			logger.Fatal().Err(err).Msg("checkAndLoad failed")

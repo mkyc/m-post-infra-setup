@@ -1,1 +1,1 @@
-Typically, this directory would be emtpy and roles would get installed from galaxy during docker build.   
+Typically, this directory would be empty and roles would get installed from galaxy during docker build.

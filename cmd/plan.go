@@ -15,8 +15,8 @@ var planCmd = &cobra.Command{
 To illustrate proposed changes this module runs expected logic with '--diff' and '--check' flags.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		logger.Debug().Msg("plan called")
-		configFilePath := filepath.Join(SharedDirectory, moduleShortName, configFileName)
-		stateFilePath := filepath.Join(SharedDirectory, stateFileName)
+		configFilePath := filepath.Join(SharedDirectoryPath, moduleShortName, configFileName)
+		stateFilePath := filepath.Join(SharedDirectoryPath, stateFileName)
 		config, _, err := checkAndLoad(stateFilePath, configFilePath)
 		if err != nil {
 			logger.Fatal().Err(err).Msg("checkAndLoad failed")

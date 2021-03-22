@@ -27,7 +27,7 @@ var (
 var initCmd = &cobra.Command{
 	Use:   "init",
 	Short: "initializes module configuration file",
-	Long:  `Initializes module configuration file (in ` + filepath.Join(defaultSharedDirectory, moduleShortName, configFileName) + `). `,
+	Long:  `Initializes module configuration file (in ` + filepath.Join(defaultSharedDirectoryPath, moduleShortName, configFileName) + `). `,
 	PreRun: func(cmd *cobra.Command, args []string) {
 		logger.Debug().Msg("PreRun")
 
@@ -40,9 +40,9 @@ var initCmd = &cobra.Command{
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		logger.Debug().Msg("init called")
-		moduleDirectoryPath := filepath.Join(SharedDirectory, moduleShortName)
-		configFilePath := filepath.Join(SharedDirectory, moduleShortName, configFileName)
-		stateFilePath := filepath.Join(SharedDirectory, stateFileName)
+		moduleDirectoryPath := filepath.Join(SharedDirectoryPath, moduleShortName)
+		configFilePath := filepath.Join(SharedDirectoryPath, moduleShortName, configFileName)
+		stateFilePath := filepath.Join(SharedDirectoryPath, stateFileName)
 		logger.Debug().Msg("ensure directories")
 		err := ensureDirectory(moduleDirectoryPath)
 		if err != nil {
@@ -76,7 +76,7 @@ var initCmd = &cobra.Command{
 			logger.Fatal().Err(err).Msg("backupFile failed")
 		}
 
-		config.GetParams().RsaPrivateKeyPath = to.StrPtr(filepath.Join(SharedDirectory, vmsRsaPath))
+		config.GetParams().RsaPrivateKeyPath = to.StrPtr(filepath.Join(SharedDirectoryPath, vmsRsaPath))
 
 		if !omitState {
 			if state.GetAzBIState().Status == st.Applied {

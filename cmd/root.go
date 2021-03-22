@@ -12,17 +12,17 @@ import (
 )
 
 const (
-	moduleShortName = "hi"
-	configFileName  = "hi-config.json"
-	stateFileName   = "state.json"
-	inventoryDir    = "inventory"
-	inventoryFile   = "hosts.json"
-	envDir          = "env"
-	sshKeyFile      = "ssh_key"
-	cmdlineFile     = "cmdline"
+	moduleShortName        = "hi"
+	configFileName         = "hi-config.json"
+	stateFileName          = "state.json"
+	inventoryDirectoryName = "inventory"
+	inventoryFileName      = "hosts.json"
+	envDirectoryName       = "env"
+	sshKeyFileName         = "ssh_key"
+	cmdlineFileName        = "cmdline"
 
-	defaultSharedDirectory    = "/shared"
-	defaultResourcesDirectory = "/resources"
+	defaultSharedDirectoryPath    = "/shared"
+	defaultResourcesDirectoryPath = "/resources"
 )
 
 var (
@@ -31,8 +31,8 @@ var (
 
 	Version string
 
-	SharedDirectory    string
-	ResourcesDirectory string
+	SharedDirectoryPath    string
+	ResourcesDirectoryPath string
 
 	logger zerolog.Logger
 )
@@ -40,7 +40,7 @@ var (
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:  "m-host-init",
-	Long: `Hi module is responsible for "post provisioning chores" logic such as data disks partitioning.`,
+	Long: `Module responsible for "post provisioning chores" logic such as data disks partitioning.`,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		logger.Debug().Msg("PersistentPreRun")
 
@@ -49,8 +49,8 @@ var rootCmd = &cobra.Command{
 			logger.Fatal().Err(err).Msg("BindPFlags failed")
 		}
 
-		SharedDirectory = viper.GetString("shared")
-		ResourcesDirectory = viper.GetString("resources")
+		SharedDirectoryPath = viper.GetString("shared")
+		ResourcesDirectoryPath = viper.GetString("resources")
 
 		logger.Trace().Msgf("original ansibleDebugLevel: %d", ansibleDebugLevel)
 		if ansibleDebugLevel > 6 {
@@ -79,9 +79,9 @@ func init() {
 
 	rootCmd.PersistentFlags().BoolVarP(&enableDebug, "debug", "d", false, "print debug information")
 
-	rootCmd.PersistentFlags().String("shared", defaultSharedDirectory, "shared directory location")
+	rootCmd.PersistentFlags().String("shared", defaultSharedDirectoryPath, "Shared directory path.")
 	_ = rootCmd.MarkPersistentFlagDirname("shared")
-	rootCmd.PersistentFlags().String("resources", defaultResourcesDirectory, "resources directory location")
+	rootCmd.PersistentFlags().String("resources", defaultResourcesDirectoryPath, "Resources directory path.")
 	_ = rootCmd.MarkPersistentFlagDirname("resources")
 	rootCmd.PersistentFlags().IntVarP(&ansibleDebugLevel, "ansible_debug_level", "a", 0, "set ansible debug level 0-6")
 }

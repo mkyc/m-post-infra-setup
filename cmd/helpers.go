@@ -66,8 +66,8 @@ func checkAndLoad(stateFilePath string, configFilePath string) (*hi.Config, *st.
 
 func templateInventory(config *hi.Config) error {
 	logger.Debug().Msg("templateInventory")
-	inventoryFilePath := filepath.Join(ResourcesDirectory, inventoryDir, inventoryFile)
-	err := ensureDirectory(filepath.Join(ResourcesDirectory, inventoryDir))
+	inventoryFilePath := filepath.Join(ResourcesDirectoryPath, inventoryDirectoryName, inventoryFileName)
+	err := ensureDirectory(filepath.Join(ResourcesDirectoryPath, inventoryDirectoryName))
 	if err != nil {
 		return err
 	}
@@ -111,8 +111,8 @@ func templateInventory(config *hi.Config) error {
 
 func prepareSshKey(config *hi.Config) error {
 	logger.Debug().Msg("prepareSshKey")
-	sshKeyFilePath := filepath.Join(ResourcesDirectory, envDir, sshKeyFile)
-	err := ensureDirectory(filepath.Join(ResourcesDirectory, envDir))
+	sshKeyFilePath := filepath.Join(ResourcesDirectoryPath, envDirectoryName, sshKeyFileName)
+	err := ensureDirectory(filepath.Join(ResourcesDirectoryPath, envDirectoryName))
 	if err != nil {
 		return err
 	}
@@ -130,8 +130,8 @@ func prepareSshKey(config *hi.Config) error {
 
 func enableCheckAndDiffMode() error {
 	logger.Debug().Msg("enableCheckAndDiffMode")
-	cmdlineFilePath := filepath.Join(ResourcesDirectory, envDir, cmdlineFile)
-	err := ensureDirectory(filepath.Join(ResourcesDirectory, envDir))
+	cmdlineFilePath := filepath.Join(ResourcesDirectoryPath, envDirectoryName, cmdlineFileName)
+	err := ensureDirectory(filepath.Join(ResourcesDirectoryPath, envDirectoryName))
 	if err != nil {
 		return err
 	}

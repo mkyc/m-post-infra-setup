@@ -39,7 +39,7 @@ func ansiblePlan() (string, error) {
 		logger.Fatal().Err(err).Msg("enableCheckAndDiffMode failed")
 	}
 	options := gar.Options{
-		AnsibleRunnerDir: ResourcesDirectory,
+		AnsibleRunnerDir: ResourcesDirectoryPath,
 		Playbook:         "entrypoint.yml",
 		Ident:            time.Now().Format("20060102-150405"),
 		LogsLevel:        makeAnsibleLogLevel(ansibleDebugLevel),
@@ -52,7 +52,7 @@ func ansiblePlan() (string, error) {
 func ansibleRun() (string, error) {
 	logger.Debug().Msg("ansibleRun")
 	options := gar.Options{
-		AnsibleRunnerDir: ResourcesDirectory,
+		AnsibleRunnerDir: ResourcesDirectoryPath,
 		Playbook:         "entrypoint.yml",
 		Ident:            time.Now().Format("20060102-150405"),
 		LogsLevel:        makeAnsibleLogLevel(ansibleDebugLevel),
