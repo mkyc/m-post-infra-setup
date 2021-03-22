@@ -3,4 +3,4 @@
 /resources/env/
 /resources/inventory/
 /resources/.ansible/
-/resources/.retry/
+*.retry/

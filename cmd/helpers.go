@@ -128,8 +128,8 @@ func prepareSshKey(config *hi.Config) error {
 	return nil
 }
 
-func setCheckAndDiff() error {
-	logger.Debug().Msg("setCheckAndDiff")
+func enableCheckAndDiffMode() error {
+	logger.Debug().Msg("enableCheckAndDiffMode")
 	cmdlineFilePath := filepath.Join(ResourcesDirectory, envDir, cmdlineFile)
 	err := ensureDirectory(filepath.Join(ResourcesDirectory, envDir))
 	if err != nil {

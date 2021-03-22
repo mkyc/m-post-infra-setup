@@ -34,9 +34,9 @@ func makeAnsibleLogLevel(logLevel int) gar.LogsLevel {
 
 func ansiblePlan() (string, error) {
 	logger.Debug().Msg("ansiblePlan")
-	err := setCheckAndDiff()
+	err := enableCheckAndDiffMode()
 	if err != nil {
-		logger.Fatal().Err(err).Msg("setCheckAndDiff failed")
+		logger.Fatal().Err(err).Msg("enableCheckAndDiffMode failed")
 	}
 	options := gar.Options{
 		AnsibleRunnerDir: ResourcesDirectory,

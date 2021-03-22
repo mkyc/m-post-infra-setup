@@ -80,47 +80,7 @@ var initCmd = &cobra.Command{
 
 		if !omitState {
 			if state.GetAzBIState().Status == st.Applied {
-
-				hiVmGroups := make([]hi.VmGroup, 0, 0)
-				for _, vmg := range state.GetAzBIState().GetOutput().GetVmGroups() {
-					hiVmGroup := hi.VmGroup{
-						Name:        vmg.Name,
-						AdminUser:   to.StrPtr("operations"), //TODO extract it from AzBI config when https://github.com/epiphany-platform/m-azure-basic-infrastructure/issues/76 is done
-						Hosts:       []hi.Host{},
-						MountPoints: []hi.MountPoint{},
-					}
-					for _, outputDataDisk := range vmg.GetFirstVm().DataDisks {
-						mountPoint := hi.MountPoint{
-							Lun:  outputDataDisk.Lun,
-							Path: to.StrPtr(fmt.Sprintf("/data/lun%d", *outputDataDisk.Lun)),
-						}
-						hiVmGroup.MountPoints = append(hiVmGroup.MountPoints, mountPoint)
-					}
-
-					for _, vm := range vmg.GetVms() {
-						if useHostsPublicIPs {
-							host := hi.Host{
-								Name: vm.Name,
-								Ip:   vm.PublicIp,
-							}
-							hiVmGroup.Hosts = append(hiVmGroup.Hosts, host)
-						} else {
-							if vm.PrivateIps != nil && len(vm.PrivateIps) > 0 {
-								host := hi.Host{
-									Name: vm.Name,
-									Ip:   to.StrPtr(vm.PrivateIps[0]),
-								}
-								hiVmGroup.Hosts = append(hiVmGroup.Hosts, host)
-							} else {
-								logger.Warn().Msgf("host %s doesn't have private IPs", *vm.Name)
-							}
-						}
-					}
-
-					hiVmGroups = append(hiVmGroups, hiVmGroup)
-				}
-				config.GetParams().VmGroups = hiVmGroups
-
+				config.GetParams().VmGroups = inferVmGroupsFromAzBI(state.GetAzBIState())
 			}
 		}
 
@@ -153,7 +113,49 @@ var initCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(initCmd)
 
-	initCmd.Flags().BoolVarP(&omitState, "omit_state", "o", false, "omit state values during initialization")
-	initCmd.Flags().BoolVarP(&useHostsPublicIPs, "use_public_ip", "p", false, "use public IP to access hosts")
-	initCmd.Flags().String("vms_rsa", "vms_rsa", "name of rsa keypair to be provided to machines")
+	initCmd.Flags().BoolVarP(&omitState, "omit_state", "o", false, "Omit state values during initialization. If this option is used none of config parts will get inferred from existing state.")
+	initCmd.Flags().BoolVarP(&useHostsPublicIPs, "use_public_ip", "p", false, "Use public IP to access hosts.")
+	initCmd.Flags().String("vms_rsa", "vms_rsa", "Name of rsa keypair to be used to access machines.")
+}
+
+func inferVmGroupsFromAzBI(state *st.AzBIState) []hi.VmGroup {
+	hiVmGroups := make([]hi.VmGroup, 0, 0)
+	for _, vmg := range state.GetOutput().GetVmGroups() {
+		hiVmGroup := hi.VmGroup{
+			Name:        vmg.Name,
+			AdminUser:   to.StrPtr("operations"), //TODO extract it from AzBI config when https://github.com/epiphany-platform/m-azure-basic-infrastructure/issues/76 is done
+			Hosts:       []hi.Host{},
+			MountPoints: []hi.MountPoint{},
+		}
+		for _, outputDataDisk := range vmg.GetFirstVm().DataDisks {
+			mountPoint := hi.MountPoint{
+				Lun:  outputDataDisk.Lun,
+				Path: to.StrPtr(fmt.Sprintf("/data/lun%d", *outputDataDisk.Lun)),
+			}
+			hiVmGroup.MountPoints = append(hiVmGroup.MountPoints, mountPoint)
+		}
+
+		for _, vm := range vmg.GetVms() {
+			if useHostsPublicIPs {
+				host := hi.Host{
+					Name: vm.Name,
+					Ip:   vm.PublicIp,
+				}
+				hiVmGroup.Hosts = append(hiVmGroup.Hosts, host)
+			} else {
+				if vm.PrivateIps != nil && len(vm.PrivateIps) > 0 {
+					host := hi.Host{
+						Name: vm.Name,
+						Ip:   to.StrPtr(vm.PrivateIps[0]),
+					}
+					hiVmGroup.Hosts = append(hiVmGroup.Hosts, host)
+				} else {
+					logger.Warn().Msgf("host %s doesn't have private IPs", *vm.Name)
+				}
+			}
+		}
+
+		hiVmGroups = append(hiVmGroups, hiVmGroup)
+	}
+	return hiVmGroups
 }
