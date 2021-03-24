@@ -1,0 +1,9 @@
+- name: mounter
+  hosts: all
+  tasks:
+    - name: Run "mounter" role
+      include_role:
+        name: mounter
+      loop: "{{ mountpoints }}"
+      loop_control:
+        loop_var: mount

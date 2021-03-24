@@ -1,0 +1,42 @@
+---
+- name: Check LUN
+  ansible.builtin.stat:
+    path: "/dev/disk/azure/scsi1/lun{{ mount.lun }}"
+  register: stat_lun
+
+- block:
+    - name: Get device info
+      community.general.parted:
+        device: "{{ stat_lun.stat.lnk_source }}"
+        state: info
+      register: di
+
+    - block:
+        - community.general.parted:
+            device: "{{ stat_lun.stat.lnk_source }}"
+            number: 1
+            state: present
+
+        - community.general.filesystem:
+            dev: "{{ stat_lun.stat.lnk_source }}1"
+            fstype: ext4
+
+        - ansible.posix.mount:
+            fstype: ext4
+            opts: noatime
+            src: "{{ stat_lun.stat.lnk_source }}1"
+            path: "{{ mount.mountpoint }}"
+            state: mounted
+      when: >
+        di.partitions is defined and
+        di.partitions | length == 0
+
+  become: true
+  when: >
+    stat_lun.stat.exists is defined and stat_lun.stat.exists and
+    stat_lun.stat.islnk is defined and stat_lun.stat.islnk
+
+- name: Set mountpoints fact
+  set_fact:
+    cacheable: true
+    luns: "{{ luns | default({}) | combine( { mount.lun : { stat_lun.stat.lnk_source + '1' : mount.mountpoint } } ) }}"

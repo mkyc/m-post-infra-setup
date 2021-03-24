@@ -1,0 +1,5 @@
+---
+# defaults file for mounter
+mount:
+  lun: "10"
+  mountpoint: "/data/test1"
